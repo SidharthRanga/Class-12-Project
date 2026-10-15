@@ -1,12 +1,11 @@
-from flask import Flask, send_from_directory, request, jsonify, session
+from flask import Flask, send_from_directory, request, jsonify, session, redirect, url_for
 import mysql.connector
 from ollama import Client
-
 
 connection = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="<YOUR_SQL_PASSWORD>",
+    password="<YOUR_MYSQL_PASSWORD>",
     database="<YOUR_DATABASE_NAME>"
 )
 
@@ -16,10 +15,6 @@ app = Flask(__name__)
 app.secret_key = 'top-secret'
 
 current_user_key = None
-
-@app.route('/<path:path>')
-def send_static(path):
-    return send_from_directory('.', path)
 
 @app.route('/login')
 def login_page():
@@ -41,7 +36,7 @@ def authenticate():
     if password:
         pass_check=True
         if mode =="login":
-            cursor.execute("SELECT * FROM users WHERE user = %s AND pass = %s", (username, password))
+            cursor.execute("SELECT * FROM <TABLE_NAME> WHERE <FIRST_COLUMN_NAME> = %s AND <SECOND_COLUMN_NAME> = %s", (username, password))
             record = cursor.fetchone()
             if record:
                 is_correct = True
@@ -50,18 +45,16 @@ def authenticate():
         else:
             if ollama_key:
                 key_check=True
-                cursor.execute("select * from users")
-                records = cursor.fetchall()
-                for i in records:
-                    if username == i[0]:
-                        user_check = True
+                cursor.execute("SELECT * FROM <TABLE_NAME> WHERE <FIRST_COLUMN_NAME> = %s", (username,))
+
+                record = cursor.fetchone()
+                if username == record[0]:
+                    user_check = True
                 if not user_check:
-                    cursor.execute("insert into <YOUR_TABLE_NAME> (<TABLE'S_FIRST_COLUMN_NAME>, <TABLE'S_SECOND_COLUMN_NAME>, <TABLE'S_THIRD_COLUMN_NAME>) values (%s,%s,%s)",(username,password,ollama_key))
+                    cursor.execute("insert into <TABLE_NAME> (<FIRST_COLUMN_NAME>, <SECOND_COLUMN_NAME>, <THIRD_COLUMN_NAME>) values (%s,%s,%s)",(username,password,ollama_key))
                     connection.commit()
                     is_correct=True
                     session['user_key']=ollama_key
-
-    
 
     if is_correct:
         return jsonify({'success': True})
@@ -76,6 +69,8 @@ def authenticate():
 
 @app.route('/home')
 def home_page():
+    if 'user_key' not in session:
+        return redirect(url_for('index'))
     return send_from_directory('.', 'index.html')
 
 @app.route('/clear', methods=['POST'])
@@ -85,15 +80,13 @@ def clear_history():
 
 @app.route('/')
 def index():
+    if 'user_key' in session:
+        return redirect(url_for('home_page'))
     return send_from_directory('.', 'login.html')
 
 @app.route('/chat', methods=['POST'])
 def chat():
     user_key = session.get('user_key')
-
-
-    if not user_key:
-        return jsonify({'error': 'Please login first'}), 401
 
     data = request.json
     user_message = data.get('message')
@@ -112,7 +105,6 @@ def chat():
 
     history.append({"role": "user", "content": user_message})
 
-
     try:
         response = client.chat(model="gemma4:31b-cloud", messages=history)
         ai_response = response.message.content
@@ -122,6 +114,10 @@ def chat():
         return jsonify({'response': ai_response})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/<path:path>')
+def send_static(path):
+    return send_from_directory('.', path)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
