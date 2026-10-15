@@ -6,8 +6,8 @@ from ollama import Client
 connection = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="1234",
-    database="Project"
+    password="<YOUR_SQL_PASSWORD>",
+    database="<YOUR_DATABASE_NAME>"
 )
 
 cursor = connection.cursor()
@@ -56,7 +56,7 @@ def authenticate():
                     if username == i[0]:
                         user_check = True
                 if not user_check:
-                    cursor.execute("insert into users (user, pass, ollama_api_key) values (%s,%s,%s)",(username,password,ollama_key))
+                    cursor.execute("insert into <YOUR_TABLE_NAME> (<TABLE'S_FIRST_COLUMN_NAME>, <TABLE'S_SECOND_COLUMN_NAME>, <TABLE'S_THIRD_COLUMN_NAME>) values (%s,%s,%s)",(username,password,ollama_key))
                     connection.commit()
                     is_correct=True
                     session['user_key']=ollama_key
@@ -93,7 +93,7 @@ def chat():
 
 
     if not user_key:
-        return jsonify({'error': 'Please login first. To Login Enter /login after URL'}), 401
+        return jsonify({'error': 'Please login first'}), 401
 
     data = request.json
     user_message = data.get('message')
