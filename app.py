@@ -82,7 +82,7 @@ def chat():
     global current_user_key
 
     if not current_user_key:
-        return jsonify({'error': 'Please login first'}), 401
+        return jsonify({'error': 'Please login first. To Login Enter /login after URL'}), 401
 
     data = request.json
     user_message = data.get('message')
