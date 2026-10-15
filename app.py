@@ -5,8 +5,8 @@ from ollama import Client
 connection = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="1234",
-    database="Project"
+    password="<ENTER YOUR MYSQL PASSWORD>",
+    database="<ENTER YOUR DATABASE NAME>"
 )
 
 cursor = connection.cursor()
@@ -49,13 +49,13 @@ def authenticate():
         else:
             if ollama_key:
                 key_check=True
-                cursor.execute("select * from users")
+                cursor.execute("select * from <ENTER YOUR TABLE NAME>")
                 records = cursor.fetchall()
                 for i in records:
                     if username == i[0]:
                         user_check = True
                 if not user_check:
-                    cursor.execute("insert into users (user, pass, ollama_api_key) values (%s,%s,%s)",(username,password,ollama_key))
+                    cursor.execute("insert into <ENTER YOUR TABLE NAME> (<ENTER YOUR TABLE'S FIRST COLOUMN NAME>, <ENTER YOUR TABLE'S SECOND COLOUMN NAME>, <ENTER YOUR TABLE'S THIRD COLOUMN NAME>) values (%s,%s,%s)",(username,password,ollama_key))
                     connection.commit()
                     is_correct=True
                     current_user_key=ollama_key
