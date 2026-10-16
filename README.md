@@ -4,6 +4,7 @@
 Ollama
 Flask
 MySql
+Json
 
 
 Put app.py,index.html,login.html,script.js,style.css in a folder then entering your sql database details in app.py 
