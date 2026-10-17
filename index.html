@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Counselor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <button id="settings-btn" onclick="toggleSettings()" style="position: absolute; top: 15px; right: 15px; width: 42px; height: 42px; border-radius: 50%; background: #fff; border: 1px solid #ccc; color: #000 !important; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 100; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#f0f0f0'" onmouseout="this.style.backgroundColor='#fff'">&#9881;</button>
+        <header>
+            <h1>AI Counselor</h1>
+            <p>A safe space for your thoughts</p>
+        </header>
+
+        <div id="chat-window" class="chat-window">
+            <!-- Messages will appear here -->
+            <div class="message ai-message">
+                Hello. I am your AI Counselor. How are you feeling today?
+            </div>
+        </div>
+
+
+        <div id="settings-modal" class="modal" style="display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
+            <div class="modal-content" style="background: white; padding: 20px; border-radius: 10px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-family: 'Inter', sans-serif;">
+                <h3 style="margin-top: 0;">Account Settings</h3>
+
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <label style="font-size: 0.8rem; color: #666; font-weight: 500;">Current Password</label>
+                        <button onclick="togglePasswordVisibility()" id="toggle-pass-btn" style="background: none; border: none; color: #007bff; cursor: pointer; font-size: 0.7rem; padding: 0;">Show</button>
+                    </div>
+                    <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                        <input type="password" id="current-password" readonly style="flex-grow: 1; padding: 8px; border: 1px solid #eee; border-radius: 4px; box-sizing: border-box; font-family: monospace; background: #f9f9f9; color: #999;">
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; gap: 5px; align-items: center;">
+                            <input type="password" id="new-password" placeholder="Enter new password" style="flex-grow: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: monospace;">
+                            <button onclick="toggleNewPasswordVisibility()" id="toggle-new-pass-btn" style="background: none; border: none; color: #007bff; cursor: pointer; font-size: 0.7rem; padding: 0 10px;">Show</button>
+                        </div>
+                        <button onclick="updatePassword()" style="background: #333; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: background 0.2s; width: 100%;">Save Password</button>
+                    </div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <label style="font-size: 0.8rem; color: #666; font-weight: 500;">Current API Key</label>
+                        <button onclick="toggleKeyVisibility()" id="toggle-key-btn" style="background: none; border: none; color: #007bff; cursor: pointer; font-size: 0.7rem; padding: 0;">Show</button>
+                    </div>
+                    <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                        <input type="password" id="current-api-key" readonly style="flex-grow: 1; padding: 8px; border: 1px solid #eee; border-radius: 4px; box-sizing: border-box; font-family: monospace; background: #f9f9f9; color: #999;">
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; gap: 5px; align-items: center;">
+                            <input type="password" id="new-api-key" placeholder="Enter new API key" style="flex-grow: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: monospace;">
+                            <button onclick="toggleNewKeyVisibility()" id="toggle-new-key-btn" style="background: none; border: none; color: #007bff; cursor: pointer; font-size: 0.7rem; padding: 0 10px;">Show</button>
+                        </div>
+                        <button onclick="updateApiKey()" style="background: #333; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: background 0.2s; width: 100%;">Save API Key</button>
+                    </div>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                    <button onclick="clearCurrentSessionHistory()" style="background: #fff; border: 1px solid #ff4d4d; color: #ff4d4d; cursor: pointer; padding: 8px 15px; border-radius: 4px; font-size: 0.8rem; width: 100%; transition: all 0.2s;">Clear Chat History</button>
+                    <button onclick="logout()" style="background: #fff; border: 1px solid #333; color: #333; cursor: pointer; padding: 8px 15px; border-radius: 4px; font-size: 0.8rem; width: 100%; transition: all 0.2s;">Logout</button>
+                </div>
+
+                <div style="text-align: right;">
+                    <button onclick="toggleSettings()" style="background: none; border: none; color: #666; cursor: pointer; padding: 5px 10px; font-size: 0.8rem;">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Type your message..." autocomplete="off">
+            <button id="send-btn">Send</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
